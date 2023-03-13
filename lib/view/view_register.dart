@@ -6,7 +6,6 @@ import 'package:intl/intl.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
 class Cliente {
-
   String nome;
   String email;
   String telefone;
@@ -37,29 +36,30 @@ class Cliente {
   String getDataNascimentoFormatada() {
     final formatoEntrada = DateFormat('ddMMyyyy');
     final dataOriginal = formatoEntrada.format(dataNascimento);
-    final dataFormatada = '${dataOriginal.substring(4)}-${dataOriginal.substring(2, 4)}-${dataOriginal.substring(0, 2)}';
+    final dataFormatada =
+        '${dataOriginal.substring(4)}-${dataOriginal.substring(2, 4)}-${dataOriginal.substring(0, 2)}';
     return dataFormatada;
   }
 
   // Converter para JSON
   Map<String, dynamic> toJson() => {
-    'nome': nome,
-    'email': email,
-    'telefone': telefone,
-    'cpf': cpf,
-    'data_nascimento': dataNascimento,
-    'sexo': sexo,
-  };
+        'nome': nome,
+        'email': email,
+        'telefone': telefone,
+        'cpf': cpf,
+        'data_nascimento': DateFormat('yyyy-MM-dd').format(dataNascimento),
+        'sexo': sexo,
+      };
 
   // Converter de JSON
   factory Cliente.fromJson(Map<String, dynamic> json) => Cliente(
-    nome: json['nome'],
-    email: json['email'],
-    telefone: json['telefone'],
-    cpf: json['cpf'],
-    dataNascimento: DateTime.parse(json['data_nascimento']),
-    sexo: json['sexo'],
-  );
+        nome: json['nome'],
+        email: json['email'],
+        telefone: json['telefone'],
+        cpf: json['cpf'],
+        dataNascimento: DateTime.parse(json['data_nascimento']),
+        sexo: json['sexo'],
+      );
 }
 
 class ViewRegister extends StatefulWidget {
@@ -77,113 +77,212 @@ class _ViewRegisterState extends State<ViewRegister> {
   final _cpfController = TextEditingController();
   final _dataNascimentoController = TextEditingController();
 
-
   String? _sexoValue;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: const Text('Cadastro de Cliente'),
+          backgroundColor: Color(0xFF20AB4E),
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: const [
+              Text(
+                "Cadastrar novo cliente",
+                style: TextStyle(
+                  color: Colors.white,
+                ),
+              )
+            ],
+          ),
         ),
         body: SingleChildScrollView(
           child: Padding(
               padding: const EdgeInsets.all(16.0),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      TextFormField(
-                        controller: _nomeController,
-                        decoration: const InputDecoration(labelText: 'Nome'),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Por favor, insira o nome';
-                          }
-                          return null;
-                        },
-                      ),
-                      TextFormField(
-                        controller: _emailController,
-                        decoration: const InputDecoration(labelText: 'E-mail'),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Por favor, insira o e-mail';
-                          }
-                          return null;
-                        },
-                      ),
-                      TextFormField(
-                        controller: _telefoneController,
-                        decoration: const InputDecoration(labelText: 'Telefone'),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Por favor, insira o telefone';
-                          }
-                          return null;
-                        },
-                      ),
-                      TextFormField(
-                        controller: _cpfController,
-                        decoration: const InputDecoration(labelText: 'CPF'),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Por favor, insira o CPF';
-                          }
-                          return null;
-                        },
-                      ),
-                      TextFormField(
-                        controller: _dataNascimentoController,
-                        decoration:
-                            const InputDecoration(labelText: 'Data de Nascimento'),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Por favor, insira a data de nascimento';
-                          }
-                          return null;
-                        },
-                      ),
-                      DropdownButtonFormField<String>(
-                        decoration: const InputDecoration(labelText: 'Sexo'),
-                        value: _sexoValue,
-
-                        onChanged: (value) {
-                          setState(() {
-                            _sexoValue = value;
-                          });
-                        },
-                        items: const [
-                          DropdownMenuItem(
-                            value: 'Masculino',
-                            child: Text('Masculino'),
+              child: Card(
+                  child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        TextFormField(
+                          controller: _nomeController,
+                          decoration: InputDecoration(
+                            labelText: 'Nome',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide: const BorderSide(
+                                  color: Colors.red, width: 5.0),
+                            ),
                           ),
-                          DropdownMenuItem(
-                            value: 'Feminino',
-                            child: Text('Feminino'),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Por favor, insira o nome';
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(
+                          height: 16.5,
+                        ),
+                        TextFormField(
+                          controller: _emailController,
+                          decoration: InputDecoration(
+                            labelText: 'E-mail',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide: const BorderSide(
+                                  color: Colors.red, width: 5.0),
+                            ),
                           ),
-                        ],
-                      ),
-                      ElevatedButton(
-                        onPressed: () {
-                          Cliente cliente; // Declaração da variável cliente
-                          if (_formKey.currentState!.validate()) {
-                            cliente = Cliente(
-                              nome: _nomeController.text,
-                              email: _emailController.text,
-                              telefone: _telefoneController.text,
-                              cpf: _cpfController.text,
-                              sexo: _sexoValue!,
-                              dataNascimento: DateTime.parse(_dataNascimentoController.text),
-                            );
-                            _cadastrarCliente(cliente);
-                          }
-                        },
-                        child: const Text('Cadastrar'),
-                      )
-                    ]),
-              )),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Por favor, insira o e-mail';
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(
+                          height: 16.5,
+                        ),
+                        TextFormField(
+                          controller: _telefoneController,
+                          decoration: InputDecoration(
+                            labelText: 'Telefone',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide:
+                                  BorderSide(color: Colors.red, width: 5.0),
+                            ),
+                          ),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Por favor, insira o telefone';
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(
+                          height: 16.5,
+                        ),
+                        TextFormField(
+                          controller: _cpfController,
+                          decoration: InputDecoration(
+                            labelText: 'CPF',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide:
+                                  BorderSide(color: Colors.red, width: 5.0),
+                            ),
+                          ),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Por favor, insira o CPF';
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(
+                          height: 16.5,
+                        ),
+                        TextFormField(
+                          controller: _dataNascimentoController,
+                          decoration: InputDecoration(
+                            labelText: 'Data de Nascimento',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide:
+                                  BorderSide(color: Colors.red, width: 5.0),
+                            ),
+                          ),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Por favor, insira a data de nascimento';
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(
+                          height: 16.5,
+                        ),
+                        DecoratedBox(
+                          decoration: const ShapeDecoration(
+                            shape: RoundedRectangleBorder(
+                              side: BorderSide(
+                                width: 1.0,
+                                style: BorderStyle.solid,
+                              ),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10.0)),
+                            ),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: DropdownButtonFormField<String>(
+                              decoration:
+                                  const InputDecoration(labelText: 'Sexo'),
+                              value: _sexoValue,
+                              onChanged: (value) {
+                                setState(() {
+                                  _sexoValue = value;
+                                });
+                              },
+                              items: const [
+                                DropdownMenuItem(
+                                  value: 'Masculino',
+                                  child: Text('Masculino'),
+                                ),
+                                DropdownMenuItem(
+                                  value: 'Feminino',
+                                  child: Text('Feminino'),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 16.5,
+                        ),
+                        Container(
+                          padding: const EdgeInsets.only(top: 16),
+                          alignment: Alignment.center,
+                          child: OutlinedButton(
+                            style: OutlinedButton.styleFrom(
+                              backgroundColor: Color(0xFF18833D),
+                              elevation: 5,
+                              shape: const RoundedRectangleBorder(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(10))),
+                            ),
+                            child: const Text(
+                              "Cadastrar",
+                              style: TextStyle(
+                                fontSize: 25,
+                                color: Colors.white,
+                              ),
+                            ),
+                            onPressed: () {
+                              Cliente cliente; // Declaração da variável cliente
+                              if (_formKey.currentState!.validate()) {
+                                cliente = Cliente(
+                                  nome: _nomeController.text,
+                                  email: _emailController.text,
+                                  telefone: _telefoneController.text,
+                                  cpf: _cpfController.text,
+                                  sexo: _sexoValue!,
+                                  dataNascimento: DateTime.parse(
+                                      _dataNascimentoController.text),
+                                );
+                                _cadastrarCliente(cliente);
+                              }
+                            },
+                          ),
+                        ),
+                      ]),
+                ),
+              ))),
         ));
   }
 

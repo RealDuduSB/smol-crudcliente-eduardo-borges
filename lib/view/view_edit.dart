@@ -32,16 +32,6 @@ class Cliente {
 
   bool get isCpfValido => cpf.isNotEmpty && cpf.length == 11;
 
-  bool get isDataNascimentoValida => dataNascimento.isBefore(DateTime.now());
-
-  // Obter a data de nascimento formatada
-  String getDataNascimentoFormatada() {
-    final formatoEntrada = DateFormat('dd-MM-yyyy');
-    final formatoSaida = DateFormat('yyyy-MM-dd');
-    final dataFormatada = formatoEntrada.parse(dataNascimento.toString());
-    return formatoSaida.format(dataFormatada);
-  }
-
   // Converter para JSON
   Map<String, dynamic> toJson() => {
         'nome': nome,
@@ -97,6 +87,7 @@ class _ViewEditState extends State<ViewEdit> {
       throw Exception('Erro ao obter dados do endpoint');
     }
   }
+
   Future<void> _buscarCliente() async {
     final response = await http.get(Uri.parse(
         'https://provisorio.sousmol.com.br/vagaflutter/crud-cliente/${widget.clienteId}/'));
@@ -109,7 +100,7 @@ class _ViewEditState extends State<ViewEdit> {
       _emailController.text = cliente.email;
       _telefoneController.text = cliente.telefone;
       _cpfController.text = cliente.cpf;
-      _dataNascimentoController.text = cliente.getDataNascimentoFormatada();
+      _dataNascimentoController.text = cliente.dataNascimento as String;
       _sexoValue = cliente.sexo;
     }
   }
@@ -120,16 +111,25 @@ class _ViewEditState extends State<ViewEdit> {
     _buscarCliente();
   }
 
+  final _dateMaskFormatter = MaskTextInputFormatter(
+      mask: '##/##/####', filter: {'#': RegExp(r'[0-9]')});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: const Text('Alterar dados'),
-          actions: [
-            IconButton(onPressed: (){
-              _showDeleteConfirmation(context, clienteId);
-            }, icon: const Icon(Icons.delete)),
-          ],
+          backgroundColor: Color(0xFF20AB4E),
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: const [
+              Text(
+                "Alterar dados do cliente",
+                style: TextStyle(
+                  color: Colors.white,
+                ),
+              )
+            ],
+          ),
         ),
         body: SingleChildScrollView(
           child: Padding(
@@ -146,6 +146,11 @@ class _ViewEditState extends State<ViewEdit> {
                           hintText: _nomeController.text.isNotEmpty
                               ? null
                               : 'Insira o nome',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide:
+                                const BorderSide(color: Colors.red, width: 5.0),
+                          ),
                         ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
@@ -161,6 +166,11 @@ class _ViewEditState extends State<ViewEdit> {
                           hintText: _emailController.text.isNotEmpty
                               ? null
                               : 'Insira o email',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide:
+                                const BorderSide(color: Colors.red, width: 5.0),
+                          ),
                         ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
@@ -176,6 +186,11 @@ class _ViewEditState extends State<ViewEdit> {
                           hintText: _telefoneController.text.isNotEmpty
                               ? null
                               : 'Insira o telefone',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide:
+                                const BorderSide(color: Colors.red, width: 5.0),
+                          ),
                         ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
@@ -191,6 +206,11 @@ class _ViewEditState extends State<ViewEdit> {
                           hintText: _cpfController.text.isNotEmpty
                               ? null
                               : 'Insira o CPF',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide:
+                                const BorderSide(color: Colors.red, width: 5.0),
+                          ),
                         ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
@@ -200,19 +220,24 @@ class _ViewEditState extends State<ViewEdit> {
                         },
                       ),
                       TextFormField(
-                        // inputFormatters: [
-                        //   MaskTextInputFormatter(
-                        //       mask: '##/##/####',
-                        //       filter: {"#": RegExp(r'[0-9]')}),
-                        // ],
+                        inputFormatters: [
+                          MaskTextInputFormatter(
+                              mask: '##/##/####',
+                              filter: {"#": RegExp(r'[0-9]')}),
+                        ],
                         controller: _dataNascimentoController,
-                        // decoration: InputDecoration(
-                        //   labelText: 'Data de nascimento',
-                        //   hintText: _dataNascimentoController.text.isNotEmpty
-                        //       ? DateFormat('dd/MM/yyyy').format(DateTime.parse(
-                        //           _dataNascimentoController.text))
-                        //       : 'Insira a data de nascimento',
-                        // ),
+                        decoration: InputDecoration(
+                          labelText: 'Data de nascimento',
+                          hintText: _dataNascimentoController.text.isNotEmpty
+                              ? DateFormat('dd/MM/yyyy').format(DateTime.parse(
+                                  _dataNascimentoController.text))
+                              : 'Insira a data de nascimento',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide:
+                                const BorderSide(color: Colors.red, width: 5.0),
+                          ),
+                        ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Por favor, insira a data de nascimento';
@@ -220,40 +245,64 @@ class _ViewEditState extends State<ViewEdit> {
                           return null;
                         },
                       ),
-                      DropdownButtonFormField<String>(
-                        decoration: const InputDecoration(labelText: 'Sexo'),
-                        value: _sexoValue,
-                        onChanged: (value) {
-                          setState(() {
-                            _sexoValue = value;
-                          });
-                        },
-                        items: const [
-                          DropdownMenuItem(
-                            value: 'Masculino',
-                            child: Text('Masculino'),
+                      DecoratedBox(
+                        decoration: const ShapeDecoration(
+                          shape: RoundedRectangleBorder(
+                            side: BorderSide(
+                              width: 1.0,
+                              style: BorderStyle.solid,
+                            ),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(10.0)),
                           ),
-                          DropdownMenuItem(
-                            value: 'Feminino',
-                            child: Text('Feminino'),
-                          ),
-                        ],
+                        ),
+                        child: DropdownButtonFormField<String>(
+                          decoration: const InputDecoration(labelText: 'Sexo'),
+                          value: _sexoValue,
+                          onChanged: (value) {
+                            setState(() {
+                              _sexoValue = value;
+                            });
+                          },
+                          items: const [
+                            DropdownMenuItem(
+                              value: 'Masculino',
+                              child: Text('Masculino'),
+                            ),
+                            DropdownMenuItem(
+                              value: 'Feminino',
+                              child: Text('Feminino'),
+                            ),
+                          ],
+                        ),
                       ),
-                      ElevatedButton(
-                        onPressed: () {
-                          if (_formKey.currentState!.validate()) {
-                            final cliente = Cliente(
-                              nome: _nomeController.text,
-                              email: _emailController.text,
-                              telefone: _telefoneController.text,
-                              cpf: _cpfController.text,
-                              dataNascimento: DateTime.parse(_dataNascimentoController.text),
-                              sexo: _sexoValue!,
-                            );
-                            _atualizarCliente();
-                          }
-                        },
-                        child: const Text('Atualizar'),
+                      Container(
+                        padding: const EdgeInsets.only(top: 16),
+                        alignment: Alignment.center,
+                        child: OutlinedButton(
+                          style: OutlinedButton.styleFrom(
+                            backgroundColor: Color(0xFF18833D),
+                            elevation: 5,
+                            shape: const RoundedRectangleBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(10))),
+                          ),
+                          onPressed: () {
+                            if (_formKey.currentState!.validate()) {
+                              final cliente = Cliente(
+                                nome: _nomeController.text,
+                                email: _emailController.text,
+                                telefone: _telefoneController.text,
+                                cpf: _cpfController.text,
+                                dataNascimento: DateTime.parse(
+                                    _dataNascimentoController.text),
+                                sexo: _sexoValue!,
+                              );
+                              _atualizarCliente();
+                            }
+                          },
+                          child: const Text('Atualizar'),
+                        ),
                       ),
                     ]),
               )),
@@ -297,6 +346,7 @@ class _ViewEditState extends State<ViewEdit> {
       throw Exception('Falha ao atualizar cliente');
     }
   }
+
   void _showDeleteConfirmation(BuildContext context, int id) {
     showDialog(
       context: context,
