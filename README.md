@@ -1,1 +1,3 @@
 # smol-crudcliente-eduardo-borges
+
+Foi um teste desafiador, coloquei em pratica alguns conhecimentos que eu havia utilizado poucas vezes como a integração da API com GET, POST, DELETE e PUT, tive dificuldade com o envio dos dados de dataNascimento em JSON após uma tentativa de formatar no textFiel como dd/mm/yyyy e infelizmente não consegui aplicar algumas boas práticas como um codigo limpo e mais organizado e nao adicionei nenhum gerenciamento de estado, espero muito aprender a aplicar de forma correta essas práticas trabalhanddo com o time de vocês. Agradeço muito pela oportunidade de estar participando deste processo. Aproximadamente foi trabalhado no telaproduto 22 horas para completar.
