@@ -137,7 +137,7 @@ class _ViewHomeState extends State<ViewHome> {
                     width: double.infinity,
                     // Largura da imagem (no caso, ocupando toda a largura disponível)
                     child: Image.asset(
-                        'assets/images/logo.png'), // Substitua o URL pela URL da sua imagem
+                        'assets/images/logo.png'),
                   ),
                   OutlinedButton(
                       onPressed: () {
