@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:intl/intl.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:smol_crudcliente_eduardo_borges/view/view_home.dart';
@@ -69,8 +68,6 @@ class _ViewEditState extends State<ViewEdit> {
   final _telefoneController = TextEditingController();
   final _cpfController = TextEditingController();
   final _dataNascimentoController = TextEditingController();
-
-  int get clienteId => widget.clienteId;
   String? _sexoValue;
   late List<Cliente> _clientes;
 
@@ -121,13 +118,18 @@ class _ViewEditState extends State<ViewEdit> {
           backgroundColor: Color(0xFF20AB4E),
           title: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: const [
-              Text(
+            children: [
+              const Text(
                 "Alterar dados do cliente",
                 style: TextStyle(
                   color: Colors.white,
                 ),
-              )
+              ),
+              IconButton(
+                  onPressed: () {
+                    _showDeleteConfirmation(context, widget.clienteId);
+                  },
+                  icon: Icon(Icons.delete))
             ],
           ),
         ),
